@@ -83,7 +83,7 @@ function writeDataToFile (inputs, outputs, contest, problem){
       ext: '.out',
       name: i.toString()
     })
-    fs.writeFileSync (_filename, inputs[i], 'utf-8')
+    fs.writeFileSync (_filename, outputs[i], 'utf-8')
     console.log (_filename);
   }
 }
