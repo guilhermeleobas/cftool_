@@ -1,44 +1,11 @@
 var cheerio = require('cheerio');
 var request = require('request');
 var fs = require('fs');
+var path = require ('path');
 
 var CODEFORCES_LINK = "http://codeforces.com/contest"
 var INPUT = 'input'
 var OUTPUT = 'output'
-
-// function get
-
-// var domain = "http://codeforces.com/contest/512/problem/A"
-// request (domain, function callback (err, response, html){
-//   $ = $.load(html);
-// })
-
-// function getInputs ($, type){
-//   var length = $('div.sample-test').children('div.' + type).children('pre').length
-//   var data = [];
-//   for (var i=0; i<length; i++){
-//     var aux = $('div.sample-test').children('div.' + type).children('pre').eq(i).html();
-//     aux = aux.replace(/<br\s*\/?>/mg,"\n");
-//     data.push(aux);
-//   }
-
-//   return data;
-// }
-
-// var data = fs.readFileSync('cf.html', 'utf-8');
-
-// var $ = cheerio.load(data);
-
-// var input = getInputs($, 'input');
-// var output = getInputs($, 'output');
-
-// for (key of input){
-//   console.log(key);
-// }
-
-// function getPage (domain){
-//   request (domain, parser)
-// }
 
 // type could be 'input' or 'output'
 function get ($, type){
@@ -53,25 +20,9 @@ function get ($, type){
   return data;
 }
 
-// function parser (err, response, html){
-//   return new Promise (function (resolve, reject){
-//     if (err) reject (err);
-
-//     var inputs = [];
-//     var outputs = [];
-
-//     var $ = cheerio.load(html);
-
-//     inputs = get ($, INPUT);
-//     outputs = get ($, OUTPUT);
-
-//     resolve ([inputs, output]);
-//   })
-// }
-
-function getPage (domain){
+function getPage (url){
   return new Promise ((resolve, reject) =>
-    request (domain, function (err, response, html){
+    request (url, function (err, response, html){
       if (err) reject (err);
 
       var inputs = [];
@@ -87,24 +38,66 @@ function getPage (domain){
   )
 }
 
-function checkUrl (domain){
-  if (domain.includes(CODEFORCES_LINK)){
+function checkUrl (url){
+  if (url.includes(CODEFORCES_LINK)){
     return true;
   }
   return false;
 }
 
 function checkArraySize (data){
-  return new Promise ((resolve, reject) =>
-    resolve (data)
-  )
+  if (data[0].length == data[1].length) return data;
+  else return new Error ("error");
 }
 
-function writeDataToFile (data){
-  return new Promise ((resolve, reject) =>
-    var dir = path.resolve (path.dirname());
+function mkdirSync (path) {
+  try {
+    fs.mkdirSync(path)
+  } catch (err) {
+    if (err.code !== 'EEXIST') throw err
+  }
+}
 
-  )
+function writeDataToFile (inputs, outputs, contest, problem){
+  // __dirname => current directory;
+  _dir = __dirname + '/' + contest + problem;
+  mkdirSync (_dir);
+
+  for (i in inputs){
+    _filename = path.format({
+      root: '/',
+      dir: _dir,
+      base: i.toString() + '.in',
+      ext: '.in',
+      name: i.toString()
+    })
+    fs.writeFileSync (_filename, inputs[i], 'utf-8')
+    console.log (_filename);
+  }
+
+  for (i in outputs){
+    _filename = path.format({
+      root: '/',
+      dir: _dir,
+      base: i.toString() + '.out',
+      ext: '.out',
+      name: i.toString()
+    })
+    fs.writeFileSync (_filename, inputs[i], 'utf-8')
+    console.log (_filename);
+  }
+}
+
+function getContestNumberAndProblem (url){
+  return url.match("http:\/\/codeforces\.com\/contest\/(.*)\/problem\/(.*)").slice(1);
+}
+
+function getContest (url){
+  return getContestNumberAndProblem(url)[0];
+}
+
+function getProblem (url){
+  return getContestNumberAndProblem(url)[1];
 }
 
 function main (){
@@ -115,19 +108,24 @@ function main (){
     process.exit(1);
   }
 
-  var domain = args[0];
+  var url = args[0];
 
-  if (checkUrl(domain) == false){
+  if (checkUrl(url) == false){
     console.error ("Invalid URL");
     process.exit(1);
   }
 
-  getPage (domain)
+  var contest = "";
+  var problem = "";
+
+  getPage (url)
   .then (function (data){
     return checkArraySize(data);
   })
   .then (function (data){
-    return writeDataToFile (data);
+    contest = getContest(url);
+    problem = getProblem(url);
+    return writeDataToFile (data[0], data[1], contest, problem);
   })
   .catch (console.log.bind (console));
 
