@@ -68,12 +68,3 @@ exports.getProblem = getProblem;
 function getProblem (url){
   return getContestNumberAndProblem(url)[1];
 }
-
-exports.formatUrl = formatUrl;
-function formatUrl(url){
-  if (url.match ("http://") == null){
-    url = "http://" + url;
-  }
-
-  return url;
-}

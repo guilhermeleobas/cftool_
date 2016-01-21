@@ -12,7 +12,7 @@ function mkdirSync (path) {
 
 module.exports = function (inputs, outputs, contest, problem){
   // __dirname => current directory;
-  _dir = __dirname + '/' + contest + problem;
+  _dir = process.cwd() + '/' + contest + problem.toLowerCase();
   mkdirSync (_dir);
 
   for (i in inputs){
