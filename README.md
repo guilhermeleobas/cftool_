@@ -1,2 +1,2 @@
 # cf
-Get input and outputs for a specific problem on codeforces
+Get inputs and outputs for a specific problem on codeforces
