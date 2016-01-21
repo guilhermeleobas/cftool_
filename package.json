@@ -1,6 +1,6 @@
 {
   "name": "cftool",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "get codeforces inputs and outputs for a specific problem",
   "main": "index.js",
   "dependencies": {
