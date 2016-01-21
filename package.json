@@ -1,5 +1,5 @@
 {
-  "name": "cfparser",
+  "name": "cftool",
   "version": "1.0.0",
   "description": "get codeforces inputs and outputs for a specific problem",
   "main": "index.js",
@@ -11,11 +11,14 @@
     "chai": "^3.4.1",
     "mocha": "^2.3.4"
   },
+  "bin": {
+    "cftool": "./src/cftool.js"
+  },
   "scripts": {
     "test": "mocha test/spec.js"
   },
   "repository": {
-    "url": "https://github.com/guilhermeleobas/cfparser"
+    "url": "https://github.com/guilhermeleobas/cf"
   },
   "keywords": [
     "codeforces"
@@ -23,7 +26,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/guilhermeleobas/cfparser/issues"
+    "url": "https://github.com/guilhermeleobas/cf/issues"
   },
-  "homepage": "https://github.com/guilhermeleobas/cfparser#readme"
+  "homepage": "https://github.com/guilhermeleobas/cf#readme"
 }
