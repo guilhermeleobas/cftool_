@@ -1,0 +1,88 @@
+var exec = require ('child_process').exec;
+var child_process = require ('child_process');
+var util = require ('util');
+
+var NO_COMPILE = "no compile command";
+
+var mapLanguages = {
+  "c": "c",
+  "cpp": "c++",
+  "cc": "c++",
+  "py": "python",
+  "java": "java",
+  "": ""
+}
+
+// to-do check what flags codeforces uses
+var compileCommand = {
+  "c": "gcc %s -o main",
+  "c++": "g++ %s -o main",
+  "c++11": "g++ -std=c++11 %s -o main",
+  "python": "",
+  "python3": ""
+}
+
+// var runCommand = {
+//   "c": "./main",
+//   "c++": "./main"
+//   "python": "python %s",
+//   "python3": "python3 %s"
+// }
+
+exports.detect = function (filename){
+  var ending = filename.split('.').slice(-1)[0];
+  if (mapLanguages[ending] != undefined)
+    return mapLanguages[ending]
+  else
+    return mapLanguages[""]
+}
+
+exports.compile = function (filename, language, callback){
+  
+  if (language == null){
+    language = this.detect (filename);
+  }
+  
+  if (language != ""){
+    var command = compileCommand[language];
+    if (command == ""){
+      callback( {
+        status: "not required",
+        exec: filename,
+        err: null,
+        stdout: null,
+        stderr: null
+      })
+    }
+    else {
+      command = util.format (command, filename);
+      
+      child_process.exec (command, function (_err, _stdout, _stderr){
+        
+        var _status = null;
+        
+        if (_err)
+          _status = 'error';
+        else
+          _status = 'ok';
+        
+        callback ({
+          status: _status,
+          err: _err,
+          stdout: _stdout,
+          stderr: _stderr,
+          exec: 'main'
+        })
+      })
+    }
+  }
+  else {
+    callback ({
+      status: 'error',
+      err: new Error ("Could not detect language used with the file specified"),
+      stdout: null,
+      stderr: null,
+      exec: null
+    })
+  }
+}
