@@ -16,7 +16,7 @@
     "cftool": "./src/cftool.js"
   },
   "scripts": {
-    "test": "mocha test/spec.js"
+    "test": "mocha test"
   },
   "repository": {
     "url": "https://github.com/guilhermeleobas/cftool"
