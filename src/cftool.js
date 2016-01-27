@@ -1,54 +1,49 @@
 #!/usr/bin/env node
 
 var commander = require ('commander');
-var dump = require ('./dump.js');
-var util = require ('./util.js');
-var get = require ('./get.js');
+var fwrite = require ('./fwrite.js');
+var parseHTML = require ('./parseHTML.js')
 
-commander
-  .version('1.0')
-  .option ('-g, --get <problem>', 'Get input/output for a problem or contest')
-  .parse (process.argv);
 
-function getProblem (problemUrl){
+function downloadProblem (problemUrl){
 
   var inputs = [];
   var outputs = [];
 
   var url = problemUrl;
 
-  get.getHTML (url)
+  parseHTML.getHTML (url)
   .then (function (html){
-    var $ = util.loadHTML(html);
+    var $ = parseHTML.loadHTML(html);
     return $;
   })
   .then (function ($){
-    inputs = util.getInput ($);
-    outputs = util.getOutput ($);
+    inputs = parseHTML.getInput ($);
+    outputs = parseHTML.getOutput ($);
     return [inputs, outputs];
   })
   .then (function (data){
-    return util.checkArraySize(data);
+    return parseHTML.checkArraySize(data);
   })
   .then (function (data){
-    var contest = util.getContest(url);
-    var problem = util.getProblem(url);
+    var contest = parseHTML.getContestNumber(url);
+    var problem = parseHTML.getProblemLetter(url);
     console.log (contest, problem);
-    return dump (data[0], data[1], contest, problem);
+    return fwrite (data[0], data[1], contest, problem);
   })
   .catch (console.log.bind (console));
 }
 
-function getContest (contestUrl){
+function downloadContest (contestUrl){
 
   var url = contestUrl;
 
-  get.getHTML(url)
+  parseHTML.getHTML(url)
   .then(function(html){
-    return util.loadHTML(html);
+    return parseHTML.loadHTML(html);
   })
   .then(function ($){
-    return util.parseContest($);
+    return parseHTML.parseContest($);
   })
   .then(function (links){
     links.forEach(getProblem);
@@ -64,22 +59,43 @@ function formatUrl (contest, problem){
   }
 }
 
-function main (){
+function download (number){
+  var result = number.match (/(\d{1,3})(\D*)/);
+  var contest = result[1];
+  var problem = result[2];
 
-  if (commander.get){
-    var result = commander.get.match (/(\d{1,3})(\D*)/);
-    var contest = result[1];
-    var problem = result[2];
-
-    if (problem == ''){
-      getContest(formatUrl(contest, problem));
-    }
-    else {
-      getProblem(formatUrl(contest, problem));
-    }
+  if (problem == ''){
+    downloadContest(formatUrl(contest, problem));
   }
-
-
+  else {
+    downloadProblem(formatUrl(contest, problem));
+  }
 }
 
-main()
+
+
+commander
+  .version('1.0')
+
+commander
+  .command ('get <number>')
+  .description('Get input/output for a problem or contest')
+  .action (function (number){
+    download(number);
+  })
+
+commander
+  .command ('test <file> <problem>')
+  .description ('Test your code against a problem')
+  .option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
+  .action (function (file, problem, options){
+    if (commander.language){
+      console.log ("opa")
+      console.log ("language: %s", commander.language);
+    }
+    console.log (options.language);
+    // console.log(file, problem);
+  })
+
+commander
+  .parse (process.argv);
