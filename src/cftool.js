@@ -63,7 +63,7 @@ function runCode (filename, language, inputs, outputs){
 }
 
 commander
-.version('1.0');
+.version('1.1');
 
 commander
 .command ('get <number>')
@@ -83,7 +83,7 @@ commander
 
 commander
 .command ('test <file> <problem>')
-.description ('Test your code against a problem')
+.description ('Test your code with some input')
 .option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
 .action (function (filename, problem, options){
   let language = options.language || compile.detect (filename);
