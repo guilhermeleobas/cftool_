@@ -12,20 +12,20 @@ npm install -g cftool
 
 # Usage
 
-## get
+### get
 ```
 cftool get 550A # Download inputs and outputs for problem 550A
 cftool get 600 # Download inputs and outputs for all problems on contest 600.
 ```
 
-## compile
+### compile
 ```
 cftool compile code.cc # Compile code.cc using g++
 cftool compile -l c++11 code.cc  # Compile code.cc with g++ 11
 cftool compile code.py # nothing will happen.
 ```
 
-## test
+### test
 ```
 cftool test code.cc 620A # will run code.cc with 620 inputs and compare with its outputs.
 ```
