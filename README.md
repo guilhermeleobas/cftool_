@@ -20,14 +20,14 @@ cftool get 600 # Download inputs and outputs for all problems on contest 600.
 
 ### compile
 ```
-cftool compile code.cc # Compile code.cc using g++
-cftool compile -l c++11 code.cc  # Compile code.cc with g++ 11
+cftool compile code.cc # Compile code.cc using g++.
+cftool compile -l c++11 code.cc  # Compile code.cc with g++ 11.
 cftool compile code.py # nothing will happen.
 ```
 
 ### test
 ```
-cftool test code.cc 620A # will run code.cc with 620 inputs and compare with its outputs.
+cftool test code.cc 620A # will run code.cc with 620 inputs and check if their outputs are correct.
 ```
 
 To get full list of available commands run cftool with --help flag.
