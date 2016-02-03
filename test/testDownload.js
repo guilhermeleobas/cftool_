@@ -80,9 +80,9 @@ describe ('Get problems from contest link', function (){
   })
 })
 
-describe.only ('Test cases without a <br> tag at the end', function (){
+describe ('Test cases without a <br> tag at the end', function (){
   it ('should add a <br> tag in test cases without one', function (done){
-    this.timeout (2000);
+    this.timeout (5000);
 
     let url = 'http://codeforces.com/contest/550/problem/E';
 
