@@ -1,101 +1,101 @@
 #!/usr/bin/env node
 
+"use strict";
+
+var fs = require ('fs');
 var commander = require ('commander');
-var fwrite = require ('./fwrite.js');
-var parseHTML = require ('./parseHTML.js')
+var fetch = require ('./fetchAndParse.js');
+var compile = require ('./compile.js');
+var run = require ('./run.js');
+var path = require ('path');
+const chalk = require ('chalk');
+var execSync = require ('child_process').execSync;
 
 
-function downloadProblem (problemUrl){
 
-  var inputs = [];
-  var outputs = [];
+function compileCode (file, language){
+  return compile.compile (file, language);
+}
 
-  var url = problemUrl;
+function loadInputsAndOutputs (problem){
+  return new Promise ((resolve, reject) =>{
+    let data;
+    try{
+      data = execSync ('ls ' + problem).toString().split('\n');
+    }
+    catch (err) {
+      reject (new Error ('run \'cftool get ' + problem + '\' first'));
+    }
+    let ret = {in: [], out: []};
+  
+    for (let i in data){
+      if (data[i] === '') continue;
+      else if (data[i].indexOf('in') === -1){
+        ret.out.push (problem + '/' + data[i]);
+      }
+      else {
+        ret.in.push (problem + '/' + data[i]); 
+      }
+    }
+    
+    resolve (ret);
+  });
+}
 
-  parseHTML.getHTML (url)
-  .then (function (html){
-    var $ = parseHTML.loadHTML(html);
-    return $;
+function exec (filename, language , input, output){
+  run.run (filename, language, input).then (function (codeOutput){
+    console.log (codeOutput, output);
+    console.log (run.diff (codeOutput.stdout, output));
   })
-  .then (function ($){
-    inputs = parseHTML.getInput ($);
-    outputs = parseHTML.getOutput ($);
-    return [inputs, outputs];
+}
+
+function runCode (filename, language, inputs, outputs){
+  let lastPromise = inputs.reduce (function (promise, input, index){
+    return Promise.resolve().then (function (){
+      let output = fs.readFileSync (outputs[index], 'utf8');
+      return exec (filename, language, input, output);
+    })
+  }, Promise.resolve());
+  
+  lastPromise.then (function (){
+    console.log ("All tests were executed");
+  })
+}
+
+commander
+.version('1.0');
+
+commander
+.command ('get <number>')
+.description('Get input/output for a problem or contest')
+.action (function (number){
+  fetch.fetch(number);
+});
+
+commander
+.command ('compile <file>')
+.option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
+.description ('compile your code')
+.action (function (filename, options){
+  let language = options.language || compile.detect (filename);
+  compileCode (filename, language);
+});
+
+commander
+.command ('test <file> <problem>')
+.description ('Test your code against a problem')
+.option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
+.action (function (filename, problem, options){
+  let language = options.language || compile.detect (filename);
+  compileCode (filename, language)
+  .then (function (data){
+    return loadInputsAndOutputs(problem);
   })
   .then (function (data){
-    return parseHTML.checkArraySize(data);
-  })
-  .then (function (data){
-    var contest = parseHTML.getContestNumber(url);
-    var problem = parseHTML.getProblemLetter(url);
-    console.log (contest, problem);
-    return fwrite (data[0], data[1], contest, problem);
+    return runCode (filename, language, data.in, data.out);
   })
   .catch (console.log.bind (console));
-}
-
-function downloadContest (contestUrl){
-
-  var url = contestUrl;
-
-  parseHTML.getHTML(url)
-  .then(function(html){
-    return parseHTML.loadHTML(html);
-  })
-  .then(function ($){
-    return parseHTML.parseContest($);
-  })
-  .then(function (links){
-    links.forEach(getProblem);
-  })
-}
-
-function formatUrl (contest, problem){
-  if (problem != ''){
-    return 'http://codeforces.com/contest/' + contest + '/problem/' + problem;
-  }
-  else {
-    return 'http://codeforces.com/contest/' + contest;
-  }
-}
-
-function download (number){
-  var result = number.match (/(\d{1,3})(\D*)/);
-  var contest = result[1];
-  var problem = result[2];
-
-  if (problem == ''){
-    downloadContest(formatUrl(contest, problem));
-  }
-  else {
-    downloadProblem(formatUrl(contest, problem));
-  }
-}
-
-
+});
 
 commander
-  .version('1.0')
-
-commander
-  .command ('get <number>')
-  .description('Get input/output for a problem or contest')
-  .action (function (number){
-    download(number);
-  })
-
-commander
-  .command ('test <file> <problem>')
-  .description ('Test your code against a problem')
-  .option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
-  .action (function (file, problem, options){
-    if (commander.language){
-      console.log ("opa")
-      console.log ("language: %s", commander.language);
-    }
-    console.log (options.language);
-    // console.log(file, problem);
-  })
-
-commander
-  .parse (process.argv);
+.parse (process.argv);

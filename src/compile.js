@@ -1,6 +1,8 @@
 var exec = require ('child_process').exec;
 var child_process = require ('child_process');
 var util = require ('util');
+var chalk = require ('chalk');
+
 
 var NO_COMPILE = "no compile command";
 
@@ -22,13 +24,6 @@ var compileCommand = {
   "python3": ""
 }
 
-// var runCommand = {
-//   "c": "./main",
-//   "c++": "./main"
-//   "python": "python %s",
-//   "python3": "python3 %s"
-// }
-
 exports.detect = function (filename){
   var ending = filename.split('.').slice(-1)[0];
   if (mapLanguages[ending] != undefined)
@@ -38,51 +33,60 @@ exports.detect = function (filename){
 }
 
 exports.compile = function (filename, language, callback){
-  
-  if (language == null){
-    language = this.detect (filename);
-  }
-  
-  if (language != ""){
-    var command = compileCommand[language];
-    if (command == ""){
-      callback( {
-        status: "not required",
-        exec: filename,
-        err: null,
-        stdout: null,
-        stderr: null
-      })
+
+  return new Promise ((resolve, reject) => {
+    if (language == null){
+      language = this.detect (filename);
+    }
+
+    if (language != ""){
+      var command = compileCommand[language];
+      if (command == ""){
+        console.log ('Compile: ' + chalk.green ('pass'))
+        resolve ( {
+          status: "not required",
+          exec: filename,
+          err: null,
+          stdout: null,
+          stderr: null
+        })
+      }
+      else {
+        command = util.format (command, filename);
+        child_process.exec (command, function (_err, _stdout, _stderr){
+          var _status = null;
+          if (_err){
+            console.log ('Compile: ' + chalk.red ('fail'));
+            reject ({
+              status: 'error',
+              err: _err,
+              stdout: _stdout,
+              stderr: _stderr,
+              exec: 'main'
+            })
+          }
+          else {
+            console.log ('Compile: ' + chalk.green ('ok'));
+            resolve ({
+              status: 'ok', 
+              err: _err,
+              stdout: _stdout,
+              stderr: _stderr,
+              exec: 'main'
+            })
+          }
+        })
+      }
     }
     else {
-      command = util.format (command, filename);
-      
-      child_process.exec (command, function (_err, _stdout, _stderr){
-        
-        var _status = null;
-        
-        if (_err)
-          _status = 'error';
-        else
-          _status = 'ok';
-        
-        callback ({
-          status: _status,
-          err: _err,
-          stdout: _stdout,
-          stderr: _stderr,
-          exec: 'main'
-        })
+      console.log ('Compile: ' + chalk.red ('fail! Language not detected'));
+      reject ({
+        status: 'error',
+        err: new Error ("Could not detect language used with the file specified"),
+        stdout: null,
+        stderr: null,
+        exec: null
       })
     }
-  }
-  else {
-    callback ({
-      status: 'error',
-      err: new Error ("Could not detect language used with the file specified"),
-      stdout: null,
-      stderr: null,
-      exec: null
-    })
-  }
+  })
 }

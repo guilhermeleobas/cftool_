@@ -9,35 +9,47 @@ var runCommand = {
   "python3": "python3 %s"
 }
 
+exports.diff = function (userOutput, programOutput){
+  if (userOutput == programOutput){
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
-exports.run = function (program, language, input, callback){
+
+exports.run = function (filename, language, input){
   var command = '';
-  
+
   if (runCommand[language].indexOf('%s') != -1){
-    command = util.format(runCommand[language], program);
+    command = util.format(runCommand[language], filename);
   }
   else {
     command = runCommand[language];
   }
-  
+
   command += ' < ' + input;
-  
+
   var begin = Date.now();
-  exec (command, function (_err, _stdout, _stderr){
-    
-        var _status = 'ok';
-        if (_err) _status = 'error';
-        
-        var end = Date.now();
-        var _time = ms.format (end-begin);
-        callback ({
-          status: _status,
-          err: _err,
-          stdout: _stdout,
-          stderr: _stderr,
-          time: _time
-        })     
-        
-  })
-  
+  return new Promise ((resolve, reject) => {
+    exec (command, function (_err, _stdout, _stderr){
+
+      var _status = 'ok';
+      if (_err) _status = 'error';
+
+      var end = Date.now();
+      var _time = ms.format (end-begin);
+      
+      resolve ({
+        status: _status,
+        err: _err,
+        stdout: _stdout,
+        stderr: _stderr,
+        time: _time
+      });
+      
+    });
+  });
+
 }
