@@ -13,7 +13,7 @@ describe ('test run command', function (){
   
   it ('should return the input as output', function (done){
     
-    run.run ('test/source_code/echo.py', 'python', 'teste1.txt', function (output){
+    run.run ('test/source_code/echo.py', 'python', 'teste1.txt').then(function (output){
       
       expect (output).to.have.property('stdout', 'teste1\n');
       expect (output).to.have.property('status', 'ok');

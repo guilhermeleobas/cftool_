@@ -35,70 +35,70 @@ describe ('Detect language', function (){
 
 describe ('Compile a program', function (){
   it ('should compile goodcpp.cc', function (done){
-    compile.compile("test/source_code/goodcpp.cc", null, function (output){
-      
+    compile.compile("test/source_code/goodcpp.cc", null).then( function (output){
+
       expect (output).to.have.property('exec')
       expect (output).to.have.property('status')
       expect (output).to.not.have.property('status', 'error');
       expect (output).to.have.property('exec', 'main');
 
       done();
-    })
-  })
+    });
+  });
 
   it ('should compile goodcpp2.cc', function (done){
-    compile.compile("test/source_code/goodcpp2.cc", "c++11", function (output){
-      
+    compile.compile("test/source_code/goodcpp2.cc", "c++11").then( function (output){
+
       expect (output).to.have.property('exec')
       expect (output).to.have.property('status', 'ok')
       expect (output).to.not.have.property('status', 'error');
       expect (output).to.have.property('exec', 'main');
-      
+
       done();
     });
   });
-  
+
   it ('should not compile goodcpp2.cc with g++', function (done){
-    compile.compile ('test/source_code/goodcpp2.cc', null, function (output){
-      
-        expect (output).to.have.property('status', 'error');
-        
-        done();
-    })
-  })
-  
+    compile.compile ('test/source_code/goodcpp2.cc', null).catch( function (output){
+
+      expect (output).to.have.property('status', 'error');
+
+      done();
+    });
+  });
+
   it ('should not compile badcpp.cc', function (done){
-    compile.compile ("test/source_code/badcpp.cc", null, function (output){
-      
+    compile.compile ("test/source_code/badcpp.cc", null).catch( function (output){
+
       expect (output).to.have.property('status', 'error')
       expect (output).to.have.property('err');
 
       done();
     });
-  })
+  });
 
   it ('should not compile badcpp2.cc', function (done){
-    compile.compile ("test/source_code/badcpp2.cc", null, function (output){
-      
+    compile.compile ("test/source_code/badcpp2.cc", null).catch( function (output){
+
       expect(output).to.have.property('status', 'error')
       expect(output).to.have.property('err');
 
       done();
     });
-  })
-  
+  });
+
   it ('should not compile a python program', function (done){
-    compile.compile ('test/source_code/good.py', null, function (output){
-      
+    compile.compile ('test/source_code/good.py', null).then( function (output){
+
       expect (output).to.have.property('status', 'not required');
       expect (output).to.have.property('exec', 'test/source_code/good.py');
-      
+
       done();
-    })
-  })
+    });
+  });
 
   after (function (){
     var execSync = require ('child_process').execSync;
     execSync ('rm -f main');
-  })
+  });
 })
