@@ -12,7 +12,7 @@ npm install -g cftool
 #### From source
 ```
 wget https://raw.githubusercontent.com/guilhermeleobas/cftool/compile_and_test/install.sh
-chmod +x
+chmod +x install.sh
 ./install.sh
 ```
 
