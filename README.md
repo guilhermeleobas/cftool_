@@ -2,9 +2,18 @@
 Get inputs and outputs for a specific problem on codeforces.
 
 # Install
+
+#### NPM
 You need to have both `node js` and `npm` installed in order to use `cftool`.
 ```
 npm install -g cftool
+```
+
+#### From source
+```
+wget https://raw.githubusercontent.com/guilhermeleobas/cftool/compile_and_test/install.sh
+chmod +x
+./install.sh
 ```
 
 # Version
