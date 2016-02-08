@@ -6,9 +6,9 @@ var child_process = require ('child_process');
 var writeToDisk = require ('./writeToDisk.js');
 var path = require ('path');
 
-var CONTESTLINK = 'http://codeforces.com/contest'
-var INPUT = 'input'
-var OUTPUT = 'output'
+var CONTESTLINK = "http://codeforces.com/contest";
+var INPUT = "input";
+var OUTPUT = "output";
 
 exports.getHTML = function (url){
   return new Promise ((resolve, reject) =>
@@ -23,16 +23,16 @@ exports.getHTML = function (url){
         resolve (html);
       }
     })
-  )
-}
+  );
+};
 
 exports.loadHTML = function (html){
   return cheerio.load(html);
-}
+};
 
 // type must be 'input' or 'output'
 exports.parser = function ($, type){
-  var length = $('div.sample-test').children('div.' + type).children('pre').length
+  var length = $('div.sample-test').children('div.' + type).children('pre').length;
   var data = [];
   for (var i=0; i<length; i++){
     var aux = $('div.sample-test').children('div.' + type).children('pre').eq(i).html();
@@ -48,7 +48,7 @@ exports.parser = function ($, type){
   }
 
   return data;
-}
+};
 
 exports.parseContest = function ($){
   var length = $('td.id').length;
@@ -59,35 +59,35 @@ exports.parseContest = function ($){
     links.push (aux);
   }
   return links;
-}
+};
 
 exports.getInput = function ($){
   return exports.parser ($, INPUT);
-}
+};
 
 exports.getOutput = function ($){
   return exports.parser ($, OUTPUT);
-}
+};
 
 exports.checkArraySize = function (data){
   if (data[0].length == data[1].length) return data;
   else return new Error ("error");
-}
+};
 
 exports.getContestNumberAndProblem = function (url){
   url.replace ('http://', '');
-  var regex = "codeforces.com\/contest\/(.*)\/problem\/(.*)"
+  var regex = "codeforces.com\/contest\/(.*)\/problem\/(.*)";
   var aux = url.match (regex);
   return aux.slice(1);
-}
+};
 
 exports.getContestNumber = function (url){
   return exports.getContestNumberAndProblem(url)[0];
-}
+};
 
 exports.getProblemLetter = function (url){
   return exports.getContestNumberAndProblem(url)[1];
-}
+};
 
 function printDownload (contest, problem, filesArray){
 
@@ -162,7 +162,7 @@ exports.fetchProblem = function (problemUrl){
     return printDownload(contest, problem, filesArray);
   })
   .catch (console.log.bind (console));
-}
+};
 
 exports.fetchContest = function (contestUrl){
 
@@ -178,7 +178,7 @@ exports.fetchContest = function (contestUrl){
   .then(function (links){
     links.forEach(exports.fetchProblem);
   });
-}
+};
 
 function formatUrl (contest, problem){
   if (problem !== ''){
@@ -200,5 +200,5 @@ exports.fetch = function (number){
   else {
     exports.fetchProblem(formatUrl(contest, problem));
   }
-}
+};
 
