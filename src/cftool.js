@@ -1,85 +1,116 @@
 #!/usr/bin/env node
 
+"use strict";
+
+var fs = require ('fs');
 var commander = require ('commander');
-var dump = require ('./dump.js');
-var util = require ('./util.js');
-var get = require ('./get.js');
+var fetch = require ('./fetchAndParse.js');
+var compile = require ('./compile.js');
+var run = require ('./run.js');
+var path = require ('path');
+const chalk = require ('chalk');
+var execSync = require ('child_process').execSync;
+var jsdiff = require ('diff');
+var format = require ('./format');
+
+
+function compileCode (file, language){
+  return compile.compile (file, language);
+}
+
+function loadInputsAndOutputs (problem){
+  return new Promise ((resolve, reject) =>{
+    let data;
+    try{
+      data = execSync ('ls ' + problem).toString().split('\n');
+    }
+    catch (err) {
+      reject (new Error ('run \'cftool get ' + problem + '\' first'));
+    }
+    let ret = {in: [], out: []};
+  
+    for (let i in data){
+      if (data[i] === '') continue;
+      else if (data[i].indexOf('in') === -1){
+        ret.out.push (problem + '/' + data[i]);
+      }
+      else {
+        ret.in.push (problem + '/' + data[i]); 
+      }
+    }
+    
+    resolve (ret);
+  });
+}
+
+function exec (filename, language, testCase, input, correctOutput){
+  let userOutput;
+
+  run.run (filename, language, input)
+  .then (function (_userOutput){
+    userOutput = _userOutput;
+    return format.diff (userOutput, correctOutput);
+  }).then (function (diffStatus){
+    return format.formatOutput (userOutput, correctOutput, testCase, diffStatus);
+  }).then (function (formatedOutput){
+    console.log (formatedOutput);
+    return formatedOutput;
+  }).catch (console.log.bind (console));
+}
+
+function runCode (filename, language, inputs, outputs){
+  let lastPromise = inputs.reduce (function (promise, input, index){
+    return Promise.resolve().then (function (){
+      let output = fs.readFileSync (outputs[index], 'utf8');
+      return exec (filename, language, index, input, output);
+    });
+  }, Promise.resolve());
+}
 
 commander
-  .version('1.0')
-  .option ('-g, --get <problem>', 'Get input/output for a problem or contest')
-  .parse (process.argv);
+.version('1.1');
 
-function getProblem (problemUrl){
+commander
+.command ('get <number>')
+.description('Get input/output for a problem or contest')
+.action (function (number){
+  fetch.fetch(number);
+});
 
-  var inputs = [];
-  var outputs = [];
+commander
+.command ('compile <file>')
+.option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
+.description ('compile your code')
+.action (function (filename, options){
+  let language = options.language || compile.detect (filename);
+  compileCode (filename, language);
+});
 
-  var url = problemUrl;
-
-  get.getHTML (url)
-  .then (function (html){
-    var $ = util.loadHTML(html);
-    return $;
-  })
-  .then (function ($){
-    inputs = util.getInput ($);
-    outputs = util.getOutput ($);
-    return [inputs, outputs];
+commander
+.command ('test <file> <problem>')
+.description ('Test your code with some input')
+.option ('-l, --language <language>', 'Specify a language to be used instead of the default value')
+.action (function (filename, problem, options){
+  let language = options.language || compile.detect (filename);
+  compileCode (filename, language)
+  .then (function (data){
+    if (data.status === "not required"){
+      console.log ('Compile: ' + chalk.green ('pass'));
+    }
+    else if (data.status === "error"){
+      console.log ('Compile: ' + chalk.red ('fail'));
+    }
+    else if (data.status === "ok"){
+      console.log ('Compile: ' + chalk.green ('ok'));
+    }
+    console.log();
+    return loadInputsAndOutputs(problem);
   })
   .then (function (data){
-    return util.checkArraySize(data);
-  })
-  .then (function (data){
-    var contest = util.getContest(url);
-    var problem = util.getProblem(url);
-    console.log (contest, problem);
-    return dump (data[0], data[1], contest, problem);
+    return runCode (filename, language, data.in, data.out);
   })
   .catch (console.log.bind (console));
-}
+});
 
-function getContest (contestUrl){
-
-  var url = contestUrl;
-
-  get.getHTML(url)
-  .then(function(html){
-    return util.loadHTML(html);
-  })
-  .then(function ($){
-    return util.parseContest($);
-  })
-  .then(function (links){
-    links.forEach(getProblem);
-  })
-}
-
-function formatUrl (contest, problem){
-  if (problem != ''){
-    return 'http://codeforces.com/contest/' + contest + '/problem/' + problem;
-  }
-  else {
-    return 'http://codeforces.com/contest/' + contest;
-  }
-}
-
-function main (){
-
-  if (commander.get){
-    var result = commander.get.match (/(\d{1,3})(\D*)/);
-    var contest = result[1];
-    var problem = result[2];
-
-    if (problem == ''){
-      getContest(formatUrl(contest, problem));
-    }
-    else {
-      getProblem(formatUrl(contest, problem));
-    }
-  }
-
-
-}
-
-main()
+commander
+.parse (process.argv);

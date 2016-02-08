@@ -14,7 +14,9 @@ module.exports = function (inputs, outputs, contest, problem){
   // __dirname => current directory;
   _dir = process.cwd() + '/' + contest + problem.toLowerCase();
   mkdirSync (_dir);
-
+  
+  var files = {in: [], out: []};
+  
   for (i in inputs){
     _filename = path.format({
       root: '/',
@@ -24,7 +26,8 @@ module.exports = function (inputs, outputs, contest, problem){
       name: i.toString()
     })
     fs.writeFileSync (_filename, inputs[i], 'utf-8')
-    console.log (_filename);
+    files.in.push (_filename);
+    //console.log (_filename);
   }
 
   for (i in outputs){
@@ -36,7 +39,9 @@ module.exports = function (inputs, outputs, contest, problem){
       name: i.toString()
     })
     fs.writeFileSync (_filename, outputs[i], 'utf-8')
-    console.log (_filename);
+    files.out.push (_filename);
+    //console.log (_filename);
   }
-
+  
+  return files;
 }
