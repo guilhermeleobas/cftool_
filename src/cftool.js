@@ -67,7 +67,7 @@ function runCode (filename, language, inputs, outputs){
 }
 
 commander
-.version('1.1');
+.version('1.2.1');
 
 commander
 .command ('get <number>')
