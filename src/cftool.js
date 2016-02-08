@@ -10,7 +10,8 @@ var run = require ('./run.js');
 var path = require ('path');
 const chalk = require ('chalk');
 var execSync = require ('child_process').execSync;
-
+var jsdiff = require ('diff');
+var format = require ('./format');
 
 
 function compileCode (file, language){
@@ -42,24 +43,28 @@ function loadInputsAndOutputs (problem){
   });
 }
 
-function exec (filename, language , input, output){
-  run.run (filename, language, input).then (function (codeOutput){
-    console.log (codeOutput, output);
-    console.log (run.diff (codeOutput.stdout, output));
-  })
+function exec (filename, language, testCase, input, correctOutput){
+  let userOutput;
+
+  run.run (filename, language, input)
+  .then (function (_userOutput){
+    userOutput = _userOutput;
+    return format.diff (userOutput, correctOutput);
+  }).then (function (diffStatus){
+    return format.formatOutput (userOutput, correctOutput, testCase, diffStatus);
+  }).then (function (formatedOutput){
+    console.log (formatedOutput);
+    return formatedOutput;
+  }).catch (console.log.bind (console));
 }
 
 function runCode (filename, language, inputs, outputs){
   let lastPromise = inputs.reduce (function (promise, input, index){
     return Promise.resolve().then (function (){
       let output = fs.readFileSync (outputs[index], 'utf8');
-      return exec (filename, language, input, output);
-    })
+      return exec (filename, language, index, input, output);
+    });
   }, Promise.resolve());
-  
-  lastPromise.then (function (){
-    console.log ("All tests were executed");
-  })
 }
 
 commander
@@ -89,6 +94,16 @@ commander
   let language = options.language || compile.detect (filename);
   compileCode (filename, language)
   .then (function (data){
+    if (data.status === "not required"){
+      console.log ('Compile: ' + chalk.green ('pass'));
+    }
+    else if (data.status === "error"){
+      console.log ('Compile: ' + chalk.red ('fail'));
+    }
+    else if (data.status === "ok"){
+      console.log ('Compile: ' + chalk.green ('ok'));
+    }
+    console.log();
     return loadInputsAndOutputs(problem);
   })
   .then (function (data){
