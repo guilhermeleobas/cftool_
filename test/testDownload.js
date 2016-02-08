@@ -9,7 +9,6 @@ var expect = require ('chai').expect;
 var fetch = require ('./../src/fetchAndParse.js');
 var cf = require ('./../src/cftool.js');
 
-chai.use (require('chai-things'));
 chai.should();
 
 describe ('Get contest', function (){
