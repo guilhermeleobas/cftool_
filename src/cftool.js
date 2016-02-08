@@ -10,7 +10,6 @@ var run = require ('./run.js');
 var path = require ('path');
 const chalk = require ('chalk');
 var execSync = require ('child_process').execSync;
-var jsdiff = require ('diff');
 var format = require ('./format');
 
 
