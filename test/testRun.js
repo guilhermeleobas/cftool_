@@ -9,7 +9,7 @@ describe ('test run command', function (){
     execSync('echo \'teste1\' > teste1.txt');
     execSync('echo \'a sentence lorem ipsum\' > teste2.txt');
     execSync('echo \'pong\' > teste3.txt');
-  })
+  });
   
   it ('should return the input as output', function (done){
     
@@ -21,10 +21,10 @@ describe ('test run command', function (){
       expect (output.time).to.contains('ms');
       
       done();
-    })
-  })
+    });
+  });
   
   after (function (){
     execSync('rm -f teste*.txt');
-  })
-})
+  });
+});
