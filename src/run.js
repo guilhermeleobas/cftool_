@@ -1,23 +1,24 @@
+"use strict";
+
 var util = require ('util');
 var exec = require ('child_process').exec;
-var ms = require ('./ms.js')
+var ms = require ('./ms.js');
+
 
 var runCommand = {
   "c": "./main",
   "c++": "./main",
   "python": "python %s",
   "python3": "python3 %s"
-}
+};
 
-exports.diff = function (userOutput, programOutput){
-  if (userOutput == programOutput){
-    return true;
-  }
-  else {
-    return false;
-  }
-}
-
+var ret = {
+  status: undefined,
+  err: undefined,
+  stdout: undefined,
+  stderr: undefined,
+  time: undefined
+};
 
 exports.run = function (filename, language, input){
   var command = '';
@@ -32,24 +33,23 @@ exports.run = function (filename, language, input){
   command += ' < ' + input;
 
   var begin = Date.now();
+
   return new Promise ((resolve, reject) => {
     exec (command, function (_err, _stdout, _stderr){
 
-      var _status = 'ok';
-      if (_err) _status = 'error';
+      if (_err) ret.status = 'error';
+      else ret.status = 'ok';
 
       var end = Date.now();
       var _time = ms.format (end-begin);
       
-      resolve ({
-        status: _status,
-        err: _err,
-        stdout: _stdout,
-        stderr: _stderr,
-        time: _time
-      });
+      ret.time = _time;
+      ret.err = _err;
+      ret.stdout = _stdout;
+      ret.stderr = _stderr;
+      resolve (ret);
       
     });
   });
 
-}
+};
