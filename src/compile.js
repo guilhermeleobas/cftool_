@@ -42,7 +42,6 @@ exports.compile = function (filename, language, callback){
     if (language != ""){
       var command = compileCommand[language];
       if (command == ""){
-        console.log ('Compile: ' + chalk.green ('pass'))
         resolve ( {
           status: "not required",
           exec: filename,
@@ -56,7 +55,7 @@ exports.compile = function (filename, language, callback){
         child_process.exec (command, function (_err, _stdout, _stderr){
           var _status = null;
           if (_err){
-            console.log ('Compile: ' + chalk.red ('fail'));
+            
             reject ({
               status: 'error',
               err: _err,
@@ -66,7 +65,7 @@ exports.compile = function (filename, language, callback){
             })
           }
           else {
-            console.log ('Compile: ' + chalk.green ('ok'));
+            
             resolve ({
               status: 'ok', 
               err: _err,
