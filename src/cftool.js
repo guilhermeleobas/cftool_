@@ -67,9 +67,6 @@ function runCode (filename, language, inputs, outputs){
 }
 
 commander
-.version('1.2.1');
-
-commander
 .command ('get <number>')
 .description('Get input/output for a problem or contest')
 .action (function (number){
