@@ -4,6 +4,8 @@ var chai = require ('chai');
 var expect = require ('chai').expect;
 var format = require ('./../src/format.js');
 
+var indent = '      ';
+
 describe ('test format', function (){
 
   it ('should format an output with multiple lines', function (){
@@ -77,7 +79,28 @@ describe ('test format', function (){
 
     expect (output).to.equals (expectedOutput);
   })
-
+  
+  it ('should format output [\\n<\\n{\\n', function (){
+    let input = "[\n<\n{\n";
+    let eoutput = "" +
+      "      [\n" +
+      "      <\n" +
+      "      {";
+      
+    let output = format.formatLines (input);
+    
+    expect (output).to.equals (eoutput);
+  })
+  
+  it ('should format output {\\n(\\n[\\n', function (){
+    let input = "{\n(\n[\n";
+    let eoutput = "" + 
+      indent + "{\n" +
+      indent + "(\n" +
+      indent + "[";
+      
+    expect (format.formatLines (input)).to.equals (eoutput);
+  })
 
 
 });
