@@ -38,7 +38,7 @@ function show_stderr_whenErr (err){
 }
 
 function compileCode (file, language){
-  compile.compile (file, language).then(function (compileData){
+  return compile.compile (file, language).then(function (compileData){
     showCompileMessage (compileData.status);
     return compileData;
   })

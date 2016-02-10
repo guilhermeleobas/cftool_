@@ -155,7 +155,22 @@ describe ('test compile messages', function (){
     done();
   });
 
+  before (function (){
+    execSync ('./src/cftool.js get 622a');
+  })
+
+  it ('show message "ok" with command "cftool test"', function (done){
+    var compileMessage = execSync ('./src/cftool.js test test/source_code/622a.cc 622a').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+
+    expect (compileMessage).to.contains ('Compile: ok');
+
+    done();
+  });
+
   after (function (){
     execSync ('rm -f main');
+    execSync ('rm -rf 622a');
   });
 });
