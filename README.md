@@ -6,7 +6,7 @@ Get inputs and outputs for a specific problem on codeforces.
 #### NPM
 You need to have both `node js` and `npm` installed in order to use `cftool`.
 ```
-npm install -g cftool
+npm install -g https://github.com/guilhermeleobas/cftool
 ```
 
 #### From source
