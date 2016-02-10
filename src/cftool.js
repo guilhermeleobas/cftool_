@@ -12,9 +12,42 @@ const chalk = require ('chalk');
 var execSync = require ('child_process').execSync;
 var format = require ('./format');
 
+function showCompileMessage (compileStatus){
+  if (compileStatus === "not required"){
+    console.log ('Compile: ' + chalk.green ('pass'));
+  }
+  else if (compileStatus === "error"){
+    console.log ('Compile: ' + chalk.red ('fail'));
+  }
+  else if (compileStatus === "ok"){
+    console.log ('Compile: ' + chalk.green ('ok'));
+  }
+  else {
+    console.log ('none ' + compileStatus);
+  }
+  console.log();
+}
+
+function showCommandWhenErr (err){
+  console.log ('Command: ' + err.err.cmd.split(' ').slice (2).join (' '));
+  console.log ();
+}
+
+function show_stderr_whenErr (err){
+  console.log (err.stderr);
+}
 
 function compileCode (file, language){
-  return compile.compile (file, language);
+  compile.compile (file, language).then(function (compileData){
+    showCompileMessage (compileData.status);
+    return compileData;
+  })
+  .catch (function (err){
+    showCompileMessage (err.status);
+    showCommandWhenErr (err);
+    show_stderr_whenErr (err);
+  })
+  .catch (console.log.bind (console));
 }
 
 function loadInputsAndOutputs (problem){
@@ -89,17 +122,7 @@ commander
 .action (function (filename, problem, options){
   let language = options.language || compile.detect (filename);
   compileCode (filename, language)
-  .then (function (data){
-    if (data.status === "not required"){
-      console.log ('Compile: ' + chalk.green ('pass'));
-    }
-    else if (data.status === "error"){
-      console.log ('Compile: ' + chalk.red ('fail'));
-    }
-    else if (data.status === "ok"){
-      console.log ('Compile: ' + chalk.green ('ok'));
-    }
-    console.log();
+  .then (function (compileStatus){
     return loadInputsAndOutputs(problem);
   })
   .then (function (data){
