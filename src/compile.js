@@ -13,7 +13,7 @@ var mapLanguages = {
   "py": "python",
   "java": "java",
   "": ""
-}
+};
 
 // to-do check what flags codeforces uses
 var compileCommand = {
@@ -22,33 +22,35 @@ var compileCommand = {
   "c++11": "g++ -std=c++11 %s -o main",
   "python": "",
   "python3": ""
-}
+};
 
 exports.detect = function (filename){
   var ending = filename.split('.').slice(-1)[0];
-  if (mapLanguages[ending] != undefined)
-    return mapLanguages[ending]
-  else
-    return mapLanguages[""]
-}
+  if (mapLanguages[ending] !== undefined){
+    return mapLanguages[ending];
+  }
+  else{
+    return mapLanguages[""];
+  }
+};
 
 exports.compile = function (filename, language, callback){
 
   return new Promise ((resolve, reject) => {
-    if (language == null){
+    if (language === null){
       language = this.detect (filename);
     }
 
-    if (language != ""){
+    if (language !== ""){
       var command = compileCommand[language];
-      if (command == ""){
+      if (command === ""){
         resolve ( {
           status: "not required",
           exec: filename,
           err: null,
           stdout: null,
           stderr: null
-        })
+        });
       }
       else {
         command = util.format (command, filename);
@@ -62,7 +64,7 @@ exports.compile = function (filename, language, callback){
               stdout: _stdout,
               stderr: _stderr,
               exec: 'main'
-            })
+            });
           }
           else {
             
@@ -72,9 +74,9 @@ exports.compile = function (filename, language, callback){
               stdout: _stdout,
               stderr: _stderr,
               exec: 'main'
-            })
+            });
           }
-        })
+        });
       }
     }
     else {
@@ -85,7 +87,7 @@ exports.compile = function (filename, language, callback){
         stdout: null,
         stderr: null,
         exec: null
-      })
+      });
     }
-  })
-}
+  });
+};

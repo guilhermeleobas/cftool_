@@ -1,3 +1,4 @@
+var execSync = require ('child_process').execSync;
 var chai = require ('chai');
 var expect = require ('chai').expect;
 var compile = require ('./../src/compile.js');
@@ -98,7 +99,63 @@ describe ('Compile a program', function (){
   });
 
   after (function (){
-    var execSync = require ('child_process').execSync;
+    execSync ('rm -f main');
+  });
+});
+
+
+describe ('test compile messages', function (){
+
+  it ('test compile message "pass"', function (done){
+    var compileMessage = execSync ('./src/cftool.js compile test/source_code/good.py').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+    expect (compileMessage).to.equals ('Compile: pass');
+
+    done();
+  });
+
+  it ('test compile message "ok"', function (done){
+    var compileMessage = execSync ('./src/cftool.js compile test/source_code/goodcpp.cc').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+
+    expect (compileMessage).to.equals ('Compile: ok');
+
+    done();
+  });
+
+  it ('test compile message "fail"', function (done){
+    var compileMessage = execSync ('./src/cftool.js compile test/source_code/badcpp.cc').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+
+    expect (compileMessage).to.contains ('Compile: fail');
+
+    done();
+  });
+
+  it ('show command used to compile when compilation fails', function (done){
+    var compileMessage = execSync ('./src/cftool.js compile test/source_code/badcpp.cc').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+
+    expect (compileMessage).to.contains ('Command: g++ test/source_code/badcpp.cc -o main');
+
+    done();
+  });
+
+  it ('show compile error message  "fail"', function (done){
+    var compileMessage = execSync ('./src/cftool.js compile test/source_code/badcpp.cc').toString();
+
+    compileMessage = compileMessage.split ('\n').join ('');
+
+    expect (compileMessage).to.contains ('expected "FILENAME" or <FILENAME>');
+
+    done();
+  });
+
+  after (function (){
     execSync ('rm -f main');
   });
 });
