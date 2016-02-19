@@ -1,9 +1,9 @@
 "use strict";
 
 var util = require ('util');
-var exec = require ('child_process').exec;
+var child_process = require ('child_process');
 var ms = require ('./ms.js');
-
+var Promise = require ('bluebird');
 
 var runCommand = {
   "c": "./main",
@@ -23,7 +23,7 @@ var ret = {
 exports.run = function (filename, language, input){
   var command = '';
 
-  if (runCommand[language].indexOf('%s') != -1){
+  if (runCommand[language].indexOf('%s') !== -1){
     command = util.format(runCommand[language], filename);
   }
   else {
@@ -34,8 +34,8 @@ exports.run = function (filename, language, input){
 
   var begin = Date.now();
 
-  return new Promise ((resolve, reject) => {
-    exec (command, function (_err, _stdout, _stderr){
+  return new Promise (function (resolve, reject) {
+    return child_process.exec (command, function (_err, _stdout, _stderr){
 
       if (_err) ret.status = 'error';
       else ret.status = 'ok';
