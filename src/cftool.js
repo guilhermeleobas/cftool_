@@ -11,6 +11,7 @@ var path = require ('path');
 const chalk = require ('chalk');
 var execSync = require ('child_process').execSync;
 var format = require ('./format');
+var Promise = require ('bluebird');
 
 function showCompileMessage (compileStatus){
   if (compileStatus === "not required"){
