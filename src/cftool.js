@@ -13,32 +13,37 @@ var execSync = require ('child_process').execSync;
 var format = require ('./format');
 var Promise = require ('bluebird');
 
-function showCompileMessage (compileStatus){
-  if (compileStatus === "not required"){
-    console.log ('Compile: ' + chalk.green ('pass'));
-  }
-  else if (compileStatus === "error"){
-    console.log ('Compile: ' + chalk.red ('fail'));
-  }
-  else if (compileStatus === "ok"){
-    console.log ('Compile: ' + chalk.green ('ok'));
-  }
-  else {
-    console.log ('none ' + compileStatus);
-  }
-  console.log();
-}
-
-function showCommandWhenErr (err){
-  console.log ('Command: ' + err.err.cmd.split(' ').slice (2).join (' '));
-  console.log ();
-}
-
-function show_stderr_whenErr (err){
-  console.log (err.stderr);
-}
 
 function compileCode (file, language){
+  
+  // @private
+  function showCompileMessage (compileStatus){
+    if (compileStatus === "not required"){
+      console.log ('Compile: ' + chalk.green ('pass'));
+    }
+    else if (compileStatus === "error"){
+      console.log ('Compile: ' + chalk.red ('fail'));
+    }
+    else if (compileStatus === "ok"){
+      console.log ('Compile: ' + chalk.green ('ok'));
+    }
+    else {
+      console.log ('none ' + compileStatus);
+    }
+    console.log();
+  }
+
+  // @private
+  function showCommandWhenErr (err){
+    console.log ('Command: ' + err.err.cmd.split(' ').slice (2).join (' '));
+    console.log ();
+  }
+
+  // @private
+  function show_stderr_whenErr (err){
+    console.log (err.stderr);
+  }
+  
   return compile.compile (file, language).then(function (compileData){
     showCompileMessage (compileData.status);
     return compileData;
@@ -76,28 +81,31 @@ function loadInputsAndOutputs (problem){
   });
 }
 
-function exec (filename, language, testCase, input, correctOutput){
-  let userOutput;
-
-  run.run (filename, language, input)
-  .then (function (_userOutput){
-    userOutput = _userOutput;
-    return format.diff (userOutput, correctOutput);
-  }).then (function (diffStatus){
-    return format.formatOutput (userOutput, correctOutput, testCase, diffStatus);
-  }).then (function (formatedOutput){
-    console.log (formatedOutput);
-    return formatedOutput;
-  }).catch (console.log.bind (console));
-}
 
 function runCode (filename, language, inputs, outputs){
-  let lastPromise = inputs.reduce (function (promise, input, index){
-    return Promise.resolve().then (function (){
-      let output = fs.readFileSync (outputs[index], 'utf8');
-      return exec (filename, language, index, input, output);
-    });
-  }, Promise.resolve());
+  
+  // @private
+  function exec (filename, language, testCase, input, correctOutput){
+    let userOutput;
+
+    return run.run (filename, language, input)
+    .then (function (_userOutput){
+      userOutput = _userOutput;
+      return format.diff (userOutput, correctOutput);
+    }).then (function (diffStatus){
+      return format.formatOutput (userOutput, correctOutput, testCase, diffStatus);
+    }).then (function (formatedOutput){
+      console.log (formatedOutput);
+      return formatedOutput;
+    }).catch (console.log.bind (console));
+  }
+  
+
+
+  return Promise.reduce (inputs, function (_, input, index){
+    let output = fs.readFileSync(outputs[index], 'utf-8');
+    return exec (filename, language, index, input, output);
+  }, null)
 }
 
 commander
