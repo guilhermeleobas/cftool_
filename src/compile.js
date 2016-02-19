@@ -2,7 +2,7 @@ var exec = require ('child_process').exec;
 var child_process = require ('child_process');
 var util = require ('util');
 var chalk = require ('chalk');
-
+var Promise = require ('bluebird');
 
 var NO_COMPILE = "no compile command";
 

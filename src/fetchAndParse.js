@@ -5,6 +5,7 @@ var cheerio = require ('cheerio');
 var child_process = require ('child_process');
 var writeToDisk = require ('./writeToDisk.js');
 var path = require ('path');
+var Promise = require ('bluebird');
 
 var CONTESTLINK = "http://codeforces.com/contest";
 var INPUT = "input";
