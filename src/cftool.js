@@ -93,7 +93,8 @@ function runCode (filename, language, inputs, outputs){
       userOutput = _userOutput;
       return format.diff (userOutput, correctOutput);
     }).then (function (diffStatus){
-      return format.formatOutput (userOutput, correctOutput, testCase, diffStatus);
+      
+      return format.formatOutput (userOutput, correctOutput, testCase, diffStatus, true);
     }).then (function (formatedOutput){
       console.log (formatedOutput);
       return formatedOutput;

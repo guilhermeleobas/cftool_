@@ -2,31 +2,42 @@
 
 var chalk = require ('chalk');
 
-var indent = "      ";
+var red = 'red';
+var green = 'green';
+var gray = 'gray';
 
-function indentOutput (line){
-  return indent + line;
-}
+var sep = '-~-'
+var endl = '\n';
 
 exports.formatLines = function (lines){
-  let aux = lines.split ('\n').map(indentOutput);
+  let aux = lines.split ('\n');
 
   if (aux.length > 1){
     aux.splice(-1, 1);
+    aux = aux.join(endl);
   }
 
-  return aux.length > 1 ? aux.join('\n') : aux + '\n';
+  return aux + '\n';
 };
 
 exports.diff = function (userOutput, correctOutput){
   return userOutput.stdout === correctOutput;
 };
 
-exports.formatOutput = function (userOutput, correctOutput, testCase, diffStatus){
-  let s = "  Test #" + testCase + '\n' + '\n';
+// @color => Indicates whether if cftool should use colors or not
+exports.formatOutput = function (userOutput, correctOutput, testCase, diffStatus, useColors){
+
+  function colorFormat (str, color, useColors){
+    if (useColors === false)
+      return str;
+    else
+      return chalk.styles[color].open + str + chalk.styles[color].close;
+  }
+
+  let s = "## Test #" + testCase + endl;
 
   if (userOutput.status === 'err'){
-    s += indent + chalk.red ("error") + '\n';
+    s += colorFormat ("error", red, useColors) + endl;
     s += userOutput.err;
   }
   else {
@@ -34,21 +45,20 @@ exports.formatOutput = function (userOutput, correctOutput, testCase, diffStatus
     let co = exports.formatLines (correctOutput);
     let uo = exports.formatLines (userOutput.stdout);
 
-    // let co = correctOutput.split ('\n').map (indentOutput);
-    // co.splice (-1, 1).join ('\n');
-
-    // let uo = userOutput.stdout.split ('\n').map(indentOutput);
-    // uo.splice (-1, 1).join('\n');
-
     if (diffStatus === false){
-      s += indent + chalk.red ("Wrong answer - " + userOutput.time) + '\n';
-      s += indent  + chalk.green ("+ expected") + ' ' + chalk.red (" - actual") + '\n\n';
-      s += chalk.green (co) + '\n';
-      s += chalk.red (uo) + '\n';
+      s += colorFormat ("Wrong answer - " + userOutput.time, red, useColors) + endl;
+      s += colorFormat ("+ expected", green, useColors) + ' ' + colorFormat (" - actual", red, useColors) + endl;
+      s += sep + endl;
+      s += colorFormat (co, green, useColors);
+      s += sep + endl;
+      s += colorFormat (uo, red, useColors);
+      s += sep + endl;
     }
     else {
-      s += indent + chalk.green ("Accepted - " + userOutput.time) + '\n';
-      s += chalk.gray (uo) + '\n';
+      s += colorFormat ("Accepted - " + userOutput.time, green, useColors) + endl;
+      s += sep + endl;
+      s += colorFormat (uo, gray, useColors);
+      s += sep + endl;
     }
 
   }
