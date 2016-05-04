@@ -32,6 +32,7 @@ cftool get 600 # Download inputs and outputs for all problems on contest 600.
 cftool compile code.cc # Compile code.cc using g++.
 cftool compile -l c++11 code.cc  # Compile code.cc with g++ 11.
 cftool compile code.py # nothing will happen.
+cftool compile code.js # nothing will happen.
 ```
 
 ### test
@@ -59,3 +60,5 @@ To get full list of available commands run cftool with --help flag.
 
 # License
 MIT
+# Notes
+- Node support is experimental. The readline function is simplified version from 'sget' package.
