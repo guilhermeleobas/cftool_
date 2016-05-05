@@ -4,12 +4,13 @@ var util = require ('util');
 var child_process = require ('child_process');
 var ms = require ('./ms.js');
 var Promise = require ('bluebird');
+var fs = require('fs');
 
 var runCommand = {
   "c": "./main",
   "c++": "./main",
   "python": "python %s",
-  "node": "node -e \"readline=function(){var n=require('fs');require('readline');return win32=function(){return'win32'===process.platform},readSync=function(r){var e=win32()?process.stdin.fd:n.openSync('/dev/stdin','rs'),t=n.readSync(e,r,0,r.length);return win32()||n.closeSync(e),t},function(n){return n.toString(null,0,readSync(n)).replace('\\n','').replace('\\r','')}(new Buffer(256))};print=console.log;console.log=function(){};write=process.stdout.write;require('./%s')\"",
+  "node": "node -e \"" + fs.readFileSync(__dirname + "/wrapper.js").toString().replace("\n","").replace("\\","\\\\") + ";require('./%s')\"",
   "python3": "python3 %s"
 };
 
