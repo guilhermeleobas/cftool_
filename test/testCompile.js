@@ -36,6 +36,7 @@ describe ('Detect language', function (){
 
 describe ('Compile a program', function (){
   it ('should compile goodcpp.cc', function (done){
+    this.slow(5000);
     compile.compile("test/source_code/goodcpp.cc", null).then( function (output){
 
       expect (output).to.have.property('exec');
@@ -48,6 +49,7 @@ describe ('Compile a program', function (){
   });
 
   it ('should compile goodcpp2.cc', function (done){
+    this.slow(5000);
     compile.compile("test/source_code/goodcpp2.cc", "c++11").then( function (output){
 
       expect (output).to.have.property('exec');
