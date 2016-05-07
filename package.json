@@ -4,6 +4,7 @@
   "description": "get codeforces inputs and outputs for a specific problem",
   "main": "index.js",
   "dependencies": {
+    "bluebird": "^3.3.5",
     "chalk": "^1.1.1",
     "cheerio": "^0.19.0",
     "commander": "*",
@@ -17,7 +18,7 @@
     "cftool": "./src/cftool.js"
   },
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha"
   },
   "repository": {
     "url": "https://github.com/guilhermeleobas/cftool"

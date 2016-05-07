@@ -4,11 +4,13 @@ var util = require ('util');
 var child_process = require ('child_process');
 var ms = require ('./ms.js');
 var Promise = require ('bluebird');
+var fs = require('fs');
 
 var runCommand = {
   "c": "./main",
   "c++": "./main",
   "python": "python %s",
+  "node": "node -e \"" + fs.readFileSync(__dirname + "/wrapper.js").toString().replace("\n","").replace("\\","\\\\") + ";require('./%s')\"",
   "python3": "python3 %s"
 };
 

@@ -61,6 +61,13 @@ exports.formatOutput = function (userOutput, correctOutput, testCase, diffStatus
       s += sep + endl;
     }
 
+    if (typeof userOutput.stderr !== "undefined" && userOutput.stderr.length > 0) {
+      s += colorFormat ("Standard error", gray, useColors) + endl;
+      s += sep + endl;
+      s += colorFormat (userOutput.stderr, red, useColors) + endl;
+      s += sep + endl;
+    }
+
   }
 
   return s;

@@ -69,10 +69,10 @@ function loadInputsAndOutputs (problem){
   
     for (let i in data){
       if (data[i] === '') continue;
-      else if (data[i].indexOf('in') === -1){
+      else if (/.*\d+.out$/.test(data[i])){
         ret.out.push (problem + '/' + data[i]);
       }
-      else {
+      else if (/.*\d+.in$/.test(data[i])){
         ret.in.push (problem + '/' + data[i]); 
       }
     }

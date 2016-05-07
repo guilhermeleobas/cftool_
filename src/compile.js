@@ -12,6 +12,7 @@ var mapLanguages = {
   "cc": "c++",
   "py": "python",
   "java": "java",
+  "js": "node",
   "": ""
 };
 
@@ -21,6 +22,7 @@ var compileCommand = {
   "c++": "g++ %s -o main",
   "c++11": "g++ -std=c++11 %s -o main",
   "python": "",
+  "node": "",
   "python3": ""
 };
 
