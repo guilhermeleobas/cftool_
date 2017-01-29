@@ -1,3 +1,6 @@
+# DEPRECATED
+see https://github.com/guilhermeleobas/cf
+
 # cftool
 Get inputs and outputs for a specific problem on codeforces.
 
